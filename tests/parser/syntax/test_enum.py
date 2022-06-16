@@ -30,6 +30,22 @@ enum Action:
     """,
         EnumDeclarationException,
     ),
+    (
+        """
+enum Role:
+    ADMIN
+    MANAGER
+
+enum Food:
+    BANANA
+    PANCAKE
+
+@external
+def run():
+    role:uint256 = Role.Admin + Food.PANCAKE
+        """, 
+        NotTheSameEnumException,
+    )
     ("enum Foo:\n" + "\n".join([f"    member{i}" for i in range(257)]), EnumDeclarationException),
 ]
 
@@ -71,6 +87,58 @@ def run() -> Order:
         })
     """,
     "enum Foo:\n" + "\n".join([f"    member{i}" for i in range(256)]),
+    """
+enum Role:
+    ADMIN
+    MANAGER
+
+@external
+def run() :
+    role: uint256 = Role.ADMIN + Role.MANAGER
+    is_admin(role)
+
+@internal
+def is_admin(role: uint256) -> bool:
+    if role in Role.Admin:
+        return True
+    else:
+        return False
+    """,
+    """
+enum Role:
+    ADMIN
+    MANAGER
+
+@external
+def run():
+    role: uint256 = Role.ADMIN + Role.MANAGER
+    allowed(role)
+
+def allowed(role: uint256) -> bool:
+        return role is Role.Admin and role is Role.Admin
+    """,
+    """
+enum Role:
+    ADMIN
+    MANAGER
+
+@external
+def run():
+    roles: Role[2] = [Role.Admin, Role.Admin]
+    if Role.MANAGER in roles:
+        return
+    """
+    """
+enum Role:
+    ADMIN
+    MANAGER
+
+@external
+def run():
+    role:uint256 = Role.Admin
+    if role is Role.Admin or role is Role.MANAGER:
+        return
+    """
 ]
 
 
